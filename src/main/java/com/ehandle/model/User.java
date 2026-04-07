@@ -59,6 +59,9 @@ public class User implements UserDetails {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (isEnabled == null) {
+            isEnabled = true;
+        }
     }
 
     @PreUpdate
@@ -88,7 +91,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return isEnabled != null && isEnabled;
     }
 
     public enum Role {

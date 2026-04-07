@@ -36,20 +36,39 @@ public class AuthService {
         }
 
         public JwtResponse loginUser(LoginRequest loginRequest) {
-                Authentication authentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(
-                                                loginRequest.getUsername(),
-                                                loginRequest.getPassword()));
-
-                String jwt = jwtTokenProvider.generateToken(authentication);
+                log.info("Login attempt for user: {}", loginRequest.getUsername());
+                
+                // First, find the user
                 User user = userService.getUserByUsername(loginRequest.getUsername());
+                if (user == null) {
+                        throw new RuntimeException("User not found: " + loginRequest.getUsername());
+                }
+                
+                // Authenticate via Spring Security
+                try {
+                        Authentication authentication = authenticationManager.authenticate(
+                                        new UsernamePasswordAuthenticationToken(
+                                                        loginRequest.getUsername(),
+                                                        loginRequest.getPassword()));
 
-                return JwtResponse.builder()
-                                .token(jwt)
-                                .id(user.getId())
-                                .username(user.getUsername())
-                                .email(user.getEmail())
-                                .role(user.getRole().name())
-                                .build();
+                        if (authentication == null || !authentication.isAuthenticated()) {
+                                throw new RuntimeException("Authentication failed for user: " + loginRequest.getUsername());
+                        }
+
+                        String jwt = jwtTokenProvider.generateToken(authentication);
+                        
+                        return JwtResponse.builder()
+                                        .token(jwt)
+                                        .type("Bearer")
+                                        .expiresIn(86400000L)
+                                        .id(user.getId())
+                                        .username(user.getUsername())
+                                        .email(user.getEmail())
+                                        .role(user.getRole() != null ? user.getRole().name() : "USER")
+                                        .build();
+                } catch (Exception e) {
+                        log.error("Authentication failed for user: {} - {}", loginRequest.getUsername(), e.getMessage());
+                        throw new RuntimeException("Invalid username or password", e);
+                }
         }
 }

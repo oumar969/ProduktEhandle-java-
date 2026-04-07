@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
+    @Builder.Default
+    private Long expiresIn = 86400000L;
     private Long id;
     private String username;
     private String email;
