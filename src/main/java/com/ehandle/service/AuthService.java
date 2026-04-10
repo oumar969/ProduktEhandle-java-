@@ -37,13 +37,13 @@ public class AuthService {
 
         public JwtResponse loginUser(LoginRequest loginRequest) {
                 log.info("Login attempt for user: {}", loginRequest.getUsername());
-                
+
                 // First, find the user
                 User user = userService.getUserByUsername(loginRequest.getUsername());
                 if (user == null) {
                         throw new RuntimeException("User not found: " + loginRequest.getUsername());
                 }
-                
+
                 // Authenticate via Spring Security
                 try {
                         Authentication authentication = authenticationManager.authenticate(
@@ -52,11 +52,12 @@ public class AuthService {
                                                         loginRequest.getPassword()));
 
                         if (authentication == null || !authentication.isAuthenticated()) {
-                                throw new RuntimeException("Authentication failed for user: " + loginRequest.getUsername());
+                                throw new RuntimeException(
+                                                "Authentication failed for user: " + loginRequest.getUsername());
                         }
 
                         String jwt = jwtTokenProvider.generateToken(authentication);
-                        
+
                         return JwtResponse.builder()
                                         .token(jwt)
                                         .type("Bearer")
@@ -67,7 +68,8 @@ public class AuthService {
                                         .role(user.getRole() != null ? user.getRole().name() : "USER")
                                         .build();
                 } catch (Exception e) {
-                        log.error("Authentication failed for user: {} - {}", loginRequest.getUsername(), e.getMessage());
+                        log.error("Authentication failed for user: {} - {}", loginRequest.getUsername(),
+                                        e.getMessage());
                         throw new RuntimeException("Invalid username or password", e);
                 }
         }
