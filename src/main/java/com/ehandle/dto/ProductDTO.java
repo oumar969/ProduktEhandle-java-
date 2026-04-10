@@ -28,5 +28,6 @@ public class ProductDTO {
     private String sku;
     private Long categoryId;
     private String categoryName;
+    private String imageUrl;
     private Boolean isActive;
 }

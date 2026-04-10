@@ -72,6 +72,11 @@ public class ProductController {
     @Operation(summary = "Create new product", description = "Create a new product")
     public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         log.info("Creating new product: {}", productDTO.getName());
+        if (productDTO.getImageUrl() != null && !productDTO.getImageUrl().isEmpty()) {
+            log.info("Product has image data: {} bytes", productDTO.getImageUrl().length());
+        } else {
+            log.info("No image data provided");
+        }
         Product product = productService.toEntity(productDTO);
 
         Category category = categoryService.getCategoryById(productDTO.getCategoryId());

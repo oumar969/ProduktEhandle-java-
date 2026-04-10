@@ -91,6 +91,10 @@ public class ProductService {
             product.setCategory(category);
         }
 
+        if (productDetails.getImageUrl() != null) {
+            product.setImageUrl(productDetails.getImageUrl());
+        }
+
         return productRepository.save(product);
     }
 
@@ -109,6 +113,7 @@ public class ProductService {
                 .sku(product.getSku())
                 .categoryId(product.getCategory().getId())
                 .categoryName(product.getCategory().getName())
+                .imageUrl(product.getImageUrl())
                 .isActive(product.getIsActive())
                 .build();
     }
@@ -120,6 +125,7 @@ public class ProductService {
                 .price(productDTO.getPrice())
                 .quantityInStock(productDTO.getQuantityInStock())
                 .sku(productDTO.getSku())
+                .imageUrl(productDTO.getImageUrl())
                 .isActive(productDTO.getIsActive() != null ? productDTO.getIsActive() : true)
                 .build();
     }
